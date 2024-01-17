@@ -135,13 +135,14 @@ class WolfModel(nn.Module):
         self.core = DistributedDataParallel(
             torch.nn.SyncBatchNorm.convert_sync_batchnorm(self.core))
 
-    def enable_allreduce(self):
-        assert self.distribured_enabled
-        self.core.enable_allreduce()
+    # Use core.no_sync() context manager instead
+    # def enable_allreduce(self):
+    #     assert self.distribured_enabled
+    #     self.core.enable_allreduce()
 
-    def disable_allreduce(self):
-        assert self.distribured_enabled
-        self.core.disable_allreduce()
+    # def disable_allreduce(self):
+    #     assert self.distribured_enabled
+    #     self.core.disable_allreduce()
 
     def encode_global(self, data, y=None, n_bits=8, nsamples=1, random=False):
         """

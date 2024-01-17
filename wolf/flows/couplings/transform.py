@@ -55,7 +55,7 @@ class Affine(Transform):
     # @overrides
     def calc_params(self, params):
         mu, log_scale = params.chunk(2, dim=self.dim)
-        scale = log_scale.mul_(0.5).tanh_().mul(self.alpha).add(1.0)
+        scale = log_scale.mul(0.5).tanh_().mul(self.alpha).add(1.0)
         return mu, scale
 
     @staticmethod
@@ -207,7 +207,7 @@ class SymmELU(Transform):
     # @overrides
     def calc_params(self, params):
         mu, log_scale = params.chunk(2, dim=self.dim)
-        scale = log_scale.mul_(0.5).tanh_()
+        scale = log_scale.mul(0.5).tanh_()
         return mu, scale
 
     @staticmethod

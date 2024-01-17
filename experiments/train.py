@@ -12,6 +12,8 @@ import random
 import math
 import numpy as np
 
+from contextlib import nullcontext
+
 import torch
 from torch.optim.adamw import AdamW
 from torch.nn.utils import clip_grad_norm_
@@ -327,6 +329,7 @@ def train(args, train_loader, train_index, train_sampler, val_loader, val_data, 
             gnll_batch = 0
             kl_batch = 0
             nent_batch = 0
+            """
             # disable allreduce for accumulated gradient.
             if is_distributed(args.rank):
                 wolf.disable_allreduce()
@@ -344,6 +347,20 @@ def train(args, train_loader, train_index, train_sampler, val_loader, val_data, 
             # enable allreduce for the last step.
             if is_distributed(args.rank):
                 wolf.enable_allreduce()
+            """
+            # disable allreduce for accumulated gradient.
+            with wolf.core.no_sync() if is_distributed(args.rank) else nullcontext():
+                for data, y in zip (data_list[:-1], y_list[:-1]):
+                    loss_gen, loss_kl, loss_dequant = wolf.loss(data, y=y, n_bits=n_bits, nsamples=train_k)
+                    loss_gen = loss_gen.sum()
+                    loss_kl = loss_kl.sum()
+                    loss_dequant = loss_dequant.sum()
+                    loss = (loss_gen + loss_kl + loss_dequant) / batch_size
+                    loss.backward()
+                    with torch.no_grad():
+                        gnll_batch += loss_gen.item()
+                        kl_batch += loss_kl.item()
+                        nent_batch += loss_dequant.item()
             data, y = data_list[-1], y_list[-1]
             loss_gen, loss_kl, loss_dequant = wolf.loss(data, y=y, n_bits=n_bits, nsamples=train_k)
             loss_gen = loss_gen.sum()
