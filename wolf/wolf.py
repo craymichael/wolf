@@ -6,7 +6,9 @@ from typing import Dict, Tuple
 import torch
 import torch.nn as nn
 import torch.distributed as dist
-from apex.parallel import DistributedDataParallel, convert_syncbn_model
+# apex.parallel.DistributedDataParallel is deprecated. Use torch.nn.parallel.DistributedDataParallel
+# from apex.parallel import DistributedDataParallel, convert_syncbn_model
+from torch.nn.parallel import DistributedDataParallel
 
 from wolf.data.image import preprocess, postprocess
 from wolf.modules import DeQuantizer
@@ -129,7 +131,9 @@ class WolfModel(nn.Module):
         print("Initializing Distributed, rank {}, local rank {}".format(rank, local_rank))
         dist.init_process_group(backend='nccl', rank=rank)
         torch.cuda.set_device(local_rank)
-        self.core = DistributedDataParallel(convert_syncbn_model(self.core))
+        # self.core = DistributedDataParallel(convert_syncbn_model(self.core))
+        self.core = DistributedDataParallel(
+            torch.nn.SyncBatchNorm.convert_sync_batchnorm(self.core))
 
     def enable_allreduce(self):
         assert self.distribured_enabled
