@@ -96,7 +96,7 @@ def load_cifar10(data_path):
 
 
 def load_imagenet(data_path, image_size):
-    data_path = os.path.join(data_path, 'imagenet{}x{}'.format(image_size, image_size))
+    # data_path = os.path.join(data_path, 'imagenet{}x{}'.format(image_size, image_size))
     train_data = datasets.ImageFolder(os.path.join(data_path, 'train'),
                                       transform=transforms.Compose([
                                           transforms.ToTensor()
