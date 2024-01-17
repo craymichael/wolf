@@ -56,13 +56,13 @@ class UniformDeQuantizer(DeQuantizer):
     def __init__(self):
         super(UniformDeQuantizer, self).__init__()
 
-    @overrides
+    # @overrides
     def dequantize(self, x, nsamples=1) -> Tuple[torch.Tensor, torch.Tensor]:
         # [batch, nsamples, channels, H, W]
         return x.new_empty(x.size(0), nsamples, *x.size()[1:]).uniform_(), \
                x.new_zeros(x.size(0), nsamples)
 
-    @overrides
+    # @overrides
     def init(self, x, init_scale=1.0):
         with torch.no_grad():
             return self.dequantize(x)
@@ -78,7 +78,7 @@ class FlowDeQuantizer(DeQuantizer):
         self.encoder = encoder
         self.flow = DequantFlow(flow)
 
-    @overrides
+    # @overrides
     def dequantize(self, x, nsamples=1) -> Tuple[torch.Tensor, torch.Tensor]:
         batch = x.size(0)
         # [batch, *]
@@ -98,7 +98,7 @@ class FlowDeQuantizer(DeQuantizer):
         log_posteriors = log_posteriors.mul(-0.5) - logdet
         return u.view(batch, nsamples, *x.size()[1:]), log_posteriors.view(batch, nsamples)
 
-    @overrides
+    # @overrides
     def init(self, x, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         # [batch, *]
         h = self.encoder.init(x, init_scale=init_scale)
@@ -129,21 +129,21 @@ class DequantFlow(Flow):
         self.core = core
         self.sigmoid = SigmoidFlow(inverse=False)
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.core.forward(input, h=h)
         out, logdet = self.sigmoid.forward(out)
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.sigmoid.backward(input)
         out, logdet = self.core.backward(out, h=h)
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.core.init(data, h=h, init_scale=init_scale)
         out, logdet = self.sigmoid.init(out, init_scale=init_scale)

@@ -30,7 +30,7 @@ class Additive(Transform):
         super(Additive, self).__init__()
 
     @staticmethod
-    @overrides
+    # @overrides
     def fwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu = params
         z = z + mu
@@ -38,7 +38,7 @@ class Additive(Transform):
         return z, logdet
 
     @staticmethod
-    @overrides
+    # @overrides
     def bwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu = params
         z = z - mu
@@ -52,14 +52,14 @@ class Affine(Transform):
         self.dim = dim
         self.alpha = alpha
 
-    @overrides
+    # @overrides
     def calc_params(self, params):
         mu, log_scale = params.chunk(2, dim=self.dim)
         scale = log_scale.mul_(0.5).tanh_().mul(self.alpha).add(1.0)
         return mu, scale
 
     @staticmethod
-    @overrides
+    # @overrides
     def fwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu, scale = params
         z = scale * z + mu
@@ -67,14 +67,14 @@ class Affine(Transform):
         return z, logdet
 
     @staticmethod
-    @overrides
+    # @overrides
     def bwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu, scale = params
         z = (z - mu).div(scale + 1e-12)
         logdet = scale.log().view(z.size(0), -1).sum(dim=1) * -1.0
         return z, logdet
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'dim={}, alpha={}'.format(self.dim, self.alpha)
 
@@ -84,14 +84,14 @@ class ReLU(Transform):
         super(ReLU, self).__init__()
         self.dim = dim
 
-    @overrides
+    # @overrides
     def calc_params(self, params):
         mu, log_scale = params.chunk(2, dim=self.dim)
         scale = log_scale.tanh_()
         return mu, scale
 
     @staticmethod
-    @overrides
+    # @overrides
     def fwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu, scale = params
         scale = scale * z.gt(0.0).type_as(z) + 1
@@ -100,7 +100,7 @@ class ReLU(Transform):
         return z, logdet
 
     @staticmethod
-    @overrides
+    # @overrides
     def bwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu, scale = params
         z = z - mu
@@ -126,7 +126,7 @@ class NLSQ(Transform):
         super(NLSQ, self).__init__()
         self.dim = dim
 
-    @overrides
+    # @overrides
     def calc_params(self, params):
         a, logb, cprime, logd, g = params.chunk(5, dim=self.dim)
 
@@ -145,7 +145,7 @@ class NLSQ(Transform):
         return a, b, c, d, g
 
     @staticmethod
-    @overrides
+    # @overrides
     def fwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         a, b, c, d, g = params
 
@@ -158,7 +158,7 @@ class NLSQ(Transform):
         return z, logdet
 
     @staticmethod
-    @overrides
+    # @overrides
     def bwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         a, b, c, d, g = params
 
@@ -204,14 +204,14 @@ class SymmELU(Transform):
         super(SymmELU, self).__init__()
         self.dim = dim
 
-    @overrides
+    # @overrides
     def calc_params(self, params):
         mu, log_scale = params.chunk(2, dim=self.dim)
         scale = log_scale.mul_(0.5).tanh_()
         return mu, scale
 
     @staticmethod
-    @overrides
+    # @overrides
     def fwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu, scale = params
         sgn = torch.sign(z)
@@ -221,12 +221,12 @@ class SymmELU(Transform):
         return z, logdet
 
     @staticmethod
-    @overrides
+    # @overrides
     def bwd(z: torch.Tensor, params) -> Tuple[torch.Tensor, torch.Tensor]:
         mu, scale = params
         z = -torch.sign(z) * scale * (torch.exp(-torch.abs(z)) - 1.0) + mu
         return z, None
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'dim={}'.format(self.dim)

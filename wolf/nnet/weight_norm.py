@@ -77,7 +77,7 @@ class Conv2dWeightNorm(nn.Module):
     def forward(self, input):
         return self.conv(input)
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return self.conv.extra_repr()
 
@@ -123,6 +123,6 @@ class ConvTranspose2dWeightNorm(nn.Module):
     def forward(self, input):
         return self.deconv(input)
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return self.deconv.extra_repr()

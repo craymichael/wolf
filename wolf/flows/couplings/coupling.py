@@ -83,7 +83,7 @@ class NICE1d(Flow):
         params = self.net.init(z, init_scale=init_scale)
         return params
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -104,7 +104,7 @@ class NICE1d(Flow):
         z1, z2 = (z, zp) if self.up else (zp, z)
         return self.unsplit(z1, z2), logdet
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -152,7 +152,7 @@ class NICE1d(Flow):
         z1, z2 = (z, zp) if self.up else (zp, z)
         return self.unsplit(z1, z2), logdet * -1.0
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             # [batch, length, in_channels]
@@ -166,7 +166,7 @@ class NICE1d(Flow):
             z1, z2 = (z, zp) if self.up else (zp, z)
             return self.unsplit(z1, z2), logdet
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'inverse={}, in_features={}, split={}, order={}, factor={}, transform={}'.format(self.inverse, self.in_features,
                                                                                                 self.split_type, 'up' if self.up else 'down',
@@ -280,7 +280,7 @@ class NICE2d(Flow):
         params = self.net.init(z, h=h, init_scale=init_scale)
         return params
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -309,7 +309,7 @@ class NICE2d(Flow):
         z1, z2 = (z, zp) if self.up else (zp, z)
         return self.unsplit(z1, z2), logdet
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -370,7 +370,7 @@ class NICE2d(Flow):
         z1, z2 = (z, zp) if self.up else (zp, z)
         return self.unsplit(z1, z2), logdet * -1.0
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             # [batch, length, in_channels]
@@ -389,7 +389,7 @@ class NICE2d(Flow):
             z1, z2 = (z, zp) if self.up else (zp, z)
             return self.unsplit(z1, z2), logdet
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'inverse={}, in_channels={}, split={}, order={}, factor={}, transform={}'.format(self.inverse, self.in_channels,
                                                                                                 self.split_type, 'up' if self.up else 'down',
@@ -464,7 +464,7 @@ class MaskedConvFlow(Flow):
         params = self.net.init(x, h=h, init_scale=init_scale)
         return params
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -486,7 +486,7 @@ class MaskedConvFlow(Flow):
         out, logdet = self.transform.fwd(input, params)
         return out, logdet
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -601,7 +601,7 @@ class MaskedConvFlow(Flow):
         out = out[:, :, cH:cH + H, :W] if reverse else out[:, :, cH:cH + H, kW:]
         return out
 
-    @overrides
+    # @overrides
     def init(self, data, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             if self.h_net is not None:
@@ -613,7 +613,7 @@ class MaskedConvFlow(Flow):
             out, logdet = self.transform.fwd(data, params)
             return out, logdet
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'inverse={}, in_channels={}, order={}, kernel={}, transform={}'.format(self.inverse, self.in_channels, self.order,
                                                                                       self.kernel_size, self.transform)

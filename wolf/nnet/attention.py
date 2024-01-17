@@ -160,7 +160,7 @@ class MultiHeadAttention2d(nn.Module):
         self.features = channels
         self.heads = heads
 
-    @overrides
+    # @overrides
     def forward(self, x, pos_enc=None):
         # [batch, channels, height, width]
         if pos_enc is not None:

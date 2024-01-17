@@ -49,11 +49,11 @@ class GaussianDiscriminator(Discriminator):
         log_probs = log_probs.sum(dim=2) + cc
         return log_probs * -0.5
 
-    @overrides
+    # @overrides
     def sample_from_prior(self, nsamples=1, device=torch.device('cpu')):
         return self.prior.sample(nsamples, self.dim, device)
 
-    @overrides
+    # @overrides
     def sample_from_posterior(self, x, y=None, nsamples=1, random=True):
         # [batch, dim]
         mu, logvar = self(x)
@@ -63,7 +63,7 @@ class GaussianDiscriminator(Discriminator):
         log_probs = GaussianDiscriminator.log_probability_posterior(eps, logvar)
         return z, log_probs
 
-    @overrides
+    # @overrides
     def sampling_and_KL(self, x, y=None, nsamples=1):
         mu, logvar = self(x)
         # [batch, nsamples, dim]
@@ -75,7 +75,7 @@ class GaussianDiscriminator(Discriminator):
         # log_probs_prior = GaussianDiscriminator.log_probability_prior(z)
         return z, KL
 
-    @overrides
+    # @overrides
     def init(self, x, y=None, init_scale=1.0):
         with torch.no_grad():
             c = self.encoder.init(x, init_scale=init_scale)
@@ -87,7 +87,7 @@ class GaussianDiscriminator(Discriminator):
             KL = self.prior.init(z, eps, mu, logvar, init_scale=init_scale)
             return z.squeeze(1), KL
 
-    @overrides
+    # @overrides
     def sync(self):
         self.prior.sync()
 

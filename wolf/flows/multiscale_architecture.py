@@ -30,7 +30,7 @@ class MultiScalePrior(Flow):
     def sync(self):
         self.conv1x1.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         # conv1x1
         out, logdet_accum = self.conv1x1.forward(input)
@@ -44,7 +44,7 @@ class MultiScalePrior(Flow):
         out = unsplit2d([out1, out2])
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         # actnorm
         out1, out2 = split2d(input, self.z1_channels)
@@ -58,7 +58,7 @@ class MultiScalePrior(Flow):
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         # conv1x1
         out, logdet_accum = self.conv1x1.init(data, init_scale=init_scale)
@@ -93,7 +93,7 @@ class MultiScaleExternal(Flow):
         for step in self.steps:
             step.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out = input
         # [batch]
@@ -103,7 +103,7 @@ class MultiScaleExternal(Flow):
             logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         logdet_accum = input.new_zeros(input.size(0))
         out = input
@@ -112,7 +112,7 @@ class MultiScaleExternal(Flow):
             logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         out = data
         # [batch]
@@ -160,7 +160,7 @@ class MultiScaleInternal(Flow):
                 step.sync()
             prior.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out = input
         # [batch]
@@ -182,7 +182,7 @@ class MultiScaleInternal(Flow):
         out = unsplit2d(outputs)
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out = input
         outputs = []
@@ -205,7 +205,7 @@ class MultiScaleInternal(Flow):
         assert len(outputs) == 0
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         out = data
         # [batch]
@@ -292,7 +292,7 @@ class MultiScaleArchitecture(Flow):
         for block in self.blocks:
             block.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         logdet_accum = input.new_zeros(input.size(0))
         out = input
@@ -318,7 +318,7 @@ class MultiScaleArchitecture(Flow):
         assert len(outputs) == 0
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         outputs = []
         out = input
@@ -345,7 +345,7 @@ class MultiScaleArchitecture(Flow):
         assert len(outputs) == 0
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         logdet_accum = data.new_zeros(data.size(0))
         out = data

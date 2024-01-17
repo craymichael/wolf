@@ -41,7 +41,7 @@ class GlowUnit(Flow):
                                    type=coupling_type, h_type=h_type, split_type='skip', order='down',
                                    activation=activation, normalize=normalize, num_groups=num_groups)
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         # block1, type=continuous
         out, logdet_accum = self.coupling1_up.forward(input, h=h)
@@ -65,7 +65,7 @@ class GlowUnit(Flow):
 
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         # block2, type=skip
         out, logdet_accum = self.coupling2_dn.backward(input, h=h)
@@ -89,7 +89,7 @@ class GlowUnit(Flow):
 
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, h=None, init_scale=1.0):
         # block1, type=continuous
         out, logdet_accum = self.coupling1_up.init(data, h=h, init_scale=init_scale)
@@ -131,7 +131,7 @@ class GlowStep(Flow):
     def sync(self):
         self.conv1x1.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.actnorm.forward(input)
 
@@ -142,7 +142,7 @@ class GlowStep(Flow):
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, h=None) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.unit.backward(input, h=h)
 
@@ -153,7 +153,7 @@ class GlowStep(Flow):
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, h=None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.actnorm.init(data, init_scale=init_scale)
 

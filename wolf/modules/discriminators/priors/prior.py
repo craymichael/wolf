@@ -52,7 +52,7 @@ class NormalPrior(Prior):
     def __init__(self):
         super(NormalPrior, self).__init__()
 
-    @overrides
+    # @overrides
     def log_probability(self, z):
         # [batch, nsamples, dim]
         dim = z.size(2)
@@ -60,16 +60,16 @@ class NormalPrior(Prior):
         log_probs = z.pow(2).sum(dim=2) + math.log(math.pi * 2.) * dim
         return log_probs * -0.5
 
-    @overrides
+    # @overrides
     def sample(self, nsamples, dim, device=torch.device('cpu')):
         epsilon = torch.randn(nsamples, dim, device=device)
         return epsilon
 
-    @overrides
+    # @overrides
     def calcKL(self, z, eps, mu, logvar):
         return 0.5 * (mu.pow(2) + logvar.exp() - logvar - 1).sum(dim=1)
 
-    @overrides
+    # @overrides
     def init(self, z, eps, mu, logvar, init_scale=1.0):
         return self.calcKL(z, eps, mu, logvar)
 

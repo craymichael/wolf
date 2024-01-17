@@ -50,18 +50,18 @@ class CategoricalDiscriminator(Discriminator):
     def reset_parameters(self):
         nn.init.uniform_(self.embed.weight, -0.1, 0.1)
 
-    @overrides
+    # @overrides
     def to_device(self, device):
         logits = self.cat_dist.logits.to(device)
         self.cat_dist = Categorical(logits=logits)
 
-    @overrides
+    # @overrides
     def init(self, x, y=None, init_scale=1.0):
         with torch.no_grad():
             z, KL = self.sampling_and_KL(x, y=y)
             return z.squeeze(1), KL
 
-    @overrides
+    # @overrides
     def sample_from_prior(self, nsamples=1, device=torch.device('cpu')):
         # [nsamples]
         cids = self.cat_dist.sample((nsamples, )).to(device)
@@ -69,7 +69,7 @@ class CategoricalDiscriminator(Discriminator):
         # [nsamples, dim]
         return self.net(self.embed(cids))
 
-    @overrides
+    # @overrides
     def sample_from_posterior(self, x, y=None, nsamples=1, random=True):
         assert y is not None
         log_probs = x.new_zeros(x.size(0), nsamples)
@@ -77,7 +77,7 @@ class CategoricalDiscriminator(Discriminator):
         z = self.net(self.embed(y)).unsqueeze(1) + log_probs.unsqueeze(2)
         return z, log_probs
 
-    @overrides
+    # @overrides
     def sampling_and_KL(self, x, y=None, nsamples=1):
         # [batch, nsamples, dim]
         z, _ = self.sample_from_posterior(x, y=y, nsamples=nsamples, random=True)

@@ -26,7 +26,7 @@ class Conv1x1Flow(Flow):
     def sync(self):
         self.weight_inv.copy_(self.weight.data.inverse())
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -42,7 +42,7 @@ class Conv1x1Flow(Flow):
         _, logdet = torch.slogdet(self.weight)
         return out, logdet.mul(H * W)
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
@@ -58,12 +58,12 @@ class Conv1x1Flow(Flow):
         _, logdet = torch.slogdet(self.weight_inv)
         return out, logdet.mul(H * W)
 
-    @overrides
+    # @overrides
     def init(self, data, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             return self.forward(data)
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'inverse={}, in_channels={}'.format(self.inverse, self.in_channels)
 
@@ -87,7 +87,7 @@ class InvertibleLinearFlow(Flow):
     def sync(self):
         self.weight_inv.copy_(self.weight.data.inverse())
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, mask: Union[torch.Tensor, None] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
 
@@ -111,7 +111,7 @@ class InvertibleLinearFlow(Flow):
             logdet = logdet * num
         return out, logdet
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, mask: Union[torch.Tensor, None] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
 
@@ -135,12 +135,12 @@ class InvertibleLinearFlow(Flow):
             logdet = logdet * num
         return out, logdet
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, mask: Union[torch.Tensor, None] = None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             return self.forward(data, mask=mask)
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'inverse={}, in_features={}'.format(self.inverse, self.in_features)
 
@@ -179,7 +179,7 @@ class InvertibleMultiHeadFlow(Flow):
     def sync(self):
         self.weight_inv.copy_(self.weight.data.inverse())
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor, mask: Union[torch.Tensor, None] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
 
@@ -214,7 +214,7 @@ class InvertibleMultiHeadFlow(Flow):
             logdet = logdet * num
         return out, logdet
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor, mask: Union[torch.Tensor, None] = None) -> Tuple[torch.Tensor, torch.Tensor]:
         """
 
@@ -249,12 +249,12 @@ class InvertibleMultiHeadFlow(Flow):
             logdet = logdet * num
         return out, logdet
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, mask: Union[torch.Tensor, None] = None, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         with torch.no_grad():
             return self.forward(data, mask)
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         return 'inverse={}, in_features={}, heads={}, type={}'.format(self.inverse, self.in_features, self.heads, self.type)
 

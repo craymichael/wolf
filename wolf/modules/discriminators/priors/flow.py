@@ -34,7 +34,7 @@ class PriorFlowUnit(Flow):
         self.coupling2_dn = NICE1d(in_features, hidden_features=hidden_features, transform=transform, alpha=alpha,
                                    inverse=inverse, type=coupling_type, split_type='skip', order='down', activation=activation)
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         # block1, type=continuous
         out, logdet_accum = self.coupling1_up.forward(input)
@@ -58,7 +58,7 @@ class PriorFlowUnit(Flow):
 
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         # block2, type=skip
         out, logdet_accum = self.coupling2_dn.backward(input)
@@ -82,7 +82,7 @@ class PriorFlowUnit(Flow):
 
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data: torch.Tensor, init_scale=1.0):
         # block1, type=continuous
         out, logdet_accum = self.coupling1_up.init(data, init_scale=init_scale)
@@ -122,7 +122,7 @@ class PriorFlowStep(Flow):
     def sync(self):
         self.linear.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.actnorm.forward(input)
 
@@ -133,7 +133,7 @@ class PriorFlowStep(Flow):
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.unit.backward(input)
 
@@ -144,7 +144,7 @@ class PriorFlowStep(Flow):
         logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         out, logdet_accum = self.actnorm.init(data, init_scale=init_scale)
 
@@ -171,7 +171,7 @@ class PriorFlow(Flow):
         for step in self.steps:
             step.sync()
 
-    @overrides
+    # @overrides
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         out = input
         # [batch]
@@ -181,7 +181,7 @@ class PriorFlow(Flow):
             logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def backward(self, input: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         logdet_accum = input.new_zeros(input.size(0))
         out = input
@@ -190,7 +190,7 @@ class PriorFlow(Flow):
             logdet_accum = logdet_accum + logdet
         return out, logdet_accum
 
-    @overrides
+    # @overrides
     def init(self, data, init_scale=1.0) -> Tuple[torch.Tensor, torch.Tensor]:
         out = data
         # [batch]
@@ -211,7 +211,7 @@ class FlowPrior(Prior):
         self.flow = PriorFlow(num_steps, in_features, hidden_features, transform=transform, alpha=alpha,
                               coupling_type=coupling_type, activation=activation)
 
-    @overrides
+    # @overrides
     def log_probability(self, z):
         size = z.size()
         # [batch, nsamples, dim] -> [batch * nsamples, dim]
@@ -222,14 +222,14 @@ class FlowPrior(Prior):
         log_probs = log_probs * -0.5 + logdet
         return log_probs.view(size[0], size[1])
 
-    @overrides
+    # @overrides
     def sample(self, nsamples, dim, device=torch.device('cpu')):
         # [nsamples, dim]
         epsilon = torch.randn(nsamples, dim, device=device)
         z, _ = self.flow.fwdpass(epsilon)
         return z
 
-    @overrides
+    # @overrides
     def calcKL(self, z, eps, mu, logvar):
         dim = z.size(2)
         cc = math.log(math.pi * 2.)
@@ -252,7 +252,7 @@ class FlowPrior(Prior):
         log_prior = (log_prior * -0.5 + logdet).div(nsamples)
         return log_posterior - log_prior
 
-    @overrides
+    # @overrides
     def init(self, z, eps, mu, logvar, init_scale=1.0):
         dim = z.size(2)
         cc = math.log(math.pi * 2.)

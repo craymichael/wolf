@@ -60,7 +60,7 @@ class ShiftedConv2d(nn.Conv2d):
         return F.conv2d(input, self.weight, self.bias, self.stride,
                         self.padding, self.dilation, self.groups)
 
-    @overrides
+    # @overrides
     def extra_repr(self):
         s = super(ShiftedConv2d, self).extra_repr()
         s += ', order={order}'
