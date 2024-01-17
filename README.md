@@ -55,6 +55,25 @@ python -u train.py \
     --image_size 32 --n_bits 8 \
     --data_path <data path> --model_path <model path>
 ```
+
+#### Zach added
+```shell
+python distributed.py \
+    --config configs/imagenet/64x64/glow/glow-base-uni.json \
+    --epochs 15000 --valid_epochs 1 \
+    --batch_size 256 --batch_steps 16 --eval_batch_size 500 --init_batch_size 2048 \
+    --lr 0.001 --beta1 0.9 --beta2 0.999 --eps 1e-8 --warmup_steps 200 --weight_decay 5e-4 --grad_clip 0 \
+    --image_size 64 --n_bits 8 --lr_decay 0.999997 \
+    --dataset imagenet --train_k 3 \
+    --data_path '/project01/cvrl/datasets/imagenet64/as_dirs/' --model_path 'models/imagenet/' \
+    --nnodes 1 --nproc_per_node 4 --node_rank 0 --master_addr 127.0.0.1 --master_port 29500 | tee loggy-mcloggyface-"$(date -Is)".log
+
+
+cifar10 144.8 s/epoch h (measured on four Tesla V100 GPUs)
+Guesstimate: 1281167 / 50000 * 4 * 144.8 = 14841 s/epoch on ImageNet...
+    This is about 4 hours per epoch, assuming the model is the same size
+```
+
 The hyper-parameters for other datasets are provided in the paper.
 #### Note:
  - Config files, including refined version of Glow and MaCow, are provided [here](https://github.com/XuezheMax/wolf/tree/master/experiments/configs).
