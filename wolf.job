@@ -1,0 +1,44 @@
+#$ -N wolfywolf
+##$ -q gpu@@cvrl-rtx6k,gpu@@cvrl-a10,gpu@@czajka
+#$ -q gpu
+##$ -l h=*-rtx6k-*|*-a10-*
+#$ -l h=*-a10-*
+#$ -l gpu_card=4
+#$ -pe smp 30
+
+echo "Running on $(hostname -f)"
+
+if [ -r /opt/crc/Modules/current/init/bash ]; then
+    source /opt/crc/Modules/current/init/bash
+fi
+module load python
+module load conda
+
+cd /afs/crc.nd.edu/user/z/zcarmich/Projects/wolf/experiments/
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/crc/c/conda/2022/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/crc/c/conda/2022/etc/profile.d/conda.sh" ]; then
+        . "/opt/crc/c/conda/2022/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/crc/c/conda/2022/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+conda activate protonets
+
+python -u train.py \
+    --config configs/imagenet/64x64/glow/glow-base-uni.json \
+    --epochs 15000 --valid_epochs 1 \
+    --batch_size 256 --batch_steps 2 --eval_batch_size 500 --init_batch_size 2048 \
+    --lr 0.001 --beta1 0.9 --beta2 0.999 --eps 1e-8 --warmup_steps 200 --weight_decay 5e-4 --grad_clip 0 \
+    --image_size 64 --n_bits 8 --lr_decay 0.999997 \
+    --dataset imagenet --train_k 3 \
+    --data_path '/project01/cvrl/datasets/imagenet64/as_dirs/' --model_path 'models/imagenet/' \
+    --nnodes 1 --nproc_per_node 4 --node_rank 0 --master_addr 127.0.0.1 --master_port 29500 | tee loggy-mcloggyface-"$(date -Is)".log
